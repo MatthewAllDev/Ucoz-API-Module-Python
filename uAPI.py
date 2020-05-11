@@ -1,6 +1,6 @@
 # Python module for easy integration with uAPI (ucoz API).
 # author Ilya Matthew Kuvarzin <luceo2011@yandex.ru>
-# version 1.2 dated April 27, 2020
+# version 1.3 dated May 11, 2020
 
 from urllib.parse import quote_plus, urlencode
 from time import time
@@ -36,7 +36,7 @@ class Request(object):
         self.params['oauth_timestamp'] = int(time())
 
     @staticmethod
-    def __http_build_query(params: dict):
+    def __http_build_query(params: dict) -> str:
         return urlencode(dict(sorted(params.items())))
 
     @staticmethod
@@ -48,6 +48,8 @@ class Request(object):
         return res
 
     def get(self, url: str, data: dict = None) -> dict:
+    	if data is None:
+    		data = {}
         self.__update_params()
         url = self.transfer_protocol + '://' + self.site + '/uapi' + url
         query_string = Request.__http_build_query(dict(self.params, **data, **{
@@ -70,7 +72,9 @@ class Request(object):
             'oauth_signature': self.__get_signature('put', url, dict(self.params, **data))})).json()
         return response
 
-    def delete(self, url: str, data: dict) -> dict:
+    def delete(self, url: str, data: dict = None) -> dict:
+    	if data is None:
+    		data = {}
         self.__update_params()
         url = self.transfer_protocol + '://' + self.site + '/uapi' + url
         query_string = Request.__http_build_query(dict(self.params, **data, **{
